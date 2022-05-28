@@ -1,27 +1,24 @@
 
 package com.library.model;
-import java.time.temporal.ChronoUnit;
+
 import java.util.Date;
-import java.util.Scanner;
 
 public class Book {
 
-    private int bookID;           // ID given by a library to a book to make it distinguishable from other books
-    private String title;         // Title of a book 
-    private String subject;       // Subject to which a book is related!
-    private String author;        // Author of book!
-    private boolean isIssued;        // this will be true if the book is currently issued to some borrower.
-   // private HoldRequestOperations holdRequestsOperations =new HoldRequestOperations();
-    static int currentIdNumber = 0;     //This will be unique for every book, since it will be incremented when everytime
-                                        //when a book is created
+    private int bookID;
+    private String title;
+    private String subject;
+    private String author;
+    private boolean isIssued;
+    static int currentIdNumber = 0;
 
     public Book(int bookID, String title, String subject, String author, boolean isIssued) {
         currentIdNumber++;
 
-        if(bookID==-1)
+        if (bookID == -1)
             bookID = currentIdNumber;
         else
-            bookID=bookID;
+            bookID = bookID;
 
         this.bookID = bookID;
         this.title = title;
@@ -29,63 +26,65 @@ public class Book {
         this.author = author;
         this.isIssued = isIssued;
     }
-    
-    // printing book's Info
-    public void printInfo()
-    {
+
+
+    public void printInfo() {
         System.out.println(title + "\t\t\t" + author + "\t\t\t" + subject);
     }
-    
 
-    
-    /*------------Getter FUNCs.---------*/
-    
-    public String getTitle()
-    {
+
+    public int getBookID() {
+        return bookID;
+    }
+
+    public void setBookID(int bookID) {
+        this.bookID = bookID;
+    }
+
+    public String getTitle() {
         return title;
     }
 
-    public String getSubject()
-    {
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getSubject() {
         return subject;
     }
 
-    public String getAuthor()
-    {
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getAuthor() {
         return author;
     }
-    
-    public boolean getIssuedStatus()
-    {
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public boolean isIssued() {
         return isIssued;
     }
-    
-    public void setIssuedStatus(boolean s)
-    {
-        isIssued = s;
-    }
-    
-     public int getID()
-    {
-        return bookID;
-    }
-     
 
-    // Setter Static Func.
+    public void setIssued(boolean issued) {
+        isIssued = issued;
+    }
+
     public static void setIDCount(int n)
     {
-        currentIdNumber = n;
+        currentIdNumber=n;
     }
-        
-    // Returning a Book
-    public void returnBook(Borrower borrower, LoanedBooks loanedBooks)
-    {
-        loanedBooks.getBook().setIssuedStatus(false);
+
+    public void returnBook(Borrower borrower, LoanedBooks loanedBooks) {
+        loanedBooks.getBook().setIssued(false);
         loanedBooks.setDateReturned(new Date());
         borrower.removeBorrowedBook(loanedBooks);
         loanedBooks.payFine();
-        
+
         System.out.println("\nThe book " + loanedBooks.getBook().getTitle() + " is successfully returned by " + borrower.getName() + ".");
     }
-    
-}   // Book Class Closed
+
+}

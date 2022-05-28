@@ -7,21 +7,24 @@ public  class Customer
     protected String password;
     protected String name;
     protected String address;
-    protected int phoneNo;
+    protected String phoneNo;
+    protected double depositAmount;
     static int currentIdNumber = 0;     //This will be unique for every person, since it will be incremented when everytime
                                        //when a person is created
 
-    public Customer(int id,String name, String address, int phoneNo) {
+    public Customer(int id,String name, String address, String phoneNo) {
         currentIdNumber++;
 
         if(id==-1)
             id = currentIdNumber;
         else
             id = id;
+        password = Integer.toString(id);
         this.id = id;
         this.name = name;
         this.address = address;
         this.phoneNo = phoneNo;
+        this.depositAmount = 1000.00;
     }
 
     public void printInfo()
@@ -66,11 +69,11 @@ public  class Customer
         this.address = address;
     }
 
-    public int getPhoneNo() {
+    public String getPhoneNo() {
         return phoneNo;
     }
 
-    public void setPhoneNo(int phoneNo) {
+    public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
     }
 
@@ -80,6 +83,14 @@ public  class Customer
 
     public static void setCurrentIdNumber(int currentIdNumber) {
         Customer.currentIdNumber = currentIdNumber;
+    }
+
+    public double getDepositAmount() {
+        return depositAmount;
+    }
+
+    public void setDepositAmount(double depositAmount) {
+        this.depositAmount = depositAmount;
     }
 
     public static void setIDCount(int n)
