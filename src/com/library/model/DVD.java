@@ -5,14 +5,14 @@ import java.util.Date;
 public class DVD {
 
     private int dvdID;
-    private String title;
+    private String dvdName;
     private String subject;
     private String author;
     private boolean isIssued;
     static int currentIdNumber = 0;
 
 
-    public DVD(int dvdID, String title, String subject, String author, boolean isIssued) {
+    public DVD(int dvdID, String dvdName, String subject, String author, boolean isIssued) {
         currentIdNumber++;
 
         if(dvdID==-1)
@@ -21,7 +21,7 @@ public class DVD {
             dvdID=dvdID;
 
         this.dvdID = dvdID;
-        this.title = title;
+        this.dvdName = dvdName;
         this.subject = subject;
         this.author = author;
         this.isIssued = isIssued;
@@ -30,13 +30,20 @@ public class DVD {
 
     public void printInfo()
     {
-        System.out.println(title + "\t\t\t" + author + "\t\t\t" + subject);
+        System.out.println(dvdName + "\t\t\t" + author + "\t\t\t" + subject);
     }
 
+    public int getDvdID() {
+        return dvdID;
+    }
 
-    public String getTitle()
+    public void setDvdID(int dvdID) {
+        this.dvdID = dvdID;
+    }
+
+    public String getDvdName()
     {
-        return title;
+        return dvdName;
     }
 
     public String getSubject()
@@ -59,19 +66,23 @@ public class DVD {
         isIssued = s;
     }
 
+    public void setIssued(boolean issued) {
+        isIssued = issued;
+    }
+
     public static void setIDCount(int n)
     {
-        currentIdNumber = n;
+        currentIdNumber=n;
     }
 
 
-    public void returnDVD(Borrower borrower, LoanedBooks loanedBooks)
+    public void returnDVD(Borrower borrower, LoanedDVDs loanedDVDs)
     {
-        loanedBooks.getBook().setIssued(false);
-        loanedBooks.setDateReturned(new Date());
-        borrower.removeBorrowedBook(loanedBooks);
-        loanedBooks.payFine();
+        loanedDVDs.getDvd().setIssued(false);
+        loanedDVDs.setDateReturned(new Date());
+        borrower.removeBorrowedDVD(loanedDVDs);
+        loanedDVDs.payFine();
 
-        System.out.println("\nThe book " + loanedBooks.getBook().getTitle() + " is successfully returned by " + borrower.getName() + ".");
+        System.out.println("\nThe DVD name " + loanedDVDs.getDvd() + " is successfully returned by " + borrower.getName() + ".");
     }
 }

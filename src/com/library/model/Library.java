@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,12 +20,17 @@ public class Library {
     private String name;
     public static ArrayList<Customer> customers;
     private ArrayList<Book> booksInLibrary;
+    private ArrayList<DVD> dvdsInLibrary;
     private ArrayList<LoanedBooks> loans;
-    public int book_return_deadline;
-    public double per_day_fine;
-    public int hold_request_expiry;
+    private ArrayList<LoanedDVDs> loaneddvds;
+    public int bookReturnDeadline;
+    public double perDayFineForBook;
+    public double perDayFineForDVD;
 
-    /*----Following Singleton Design Pattern (Lazy Instantiation)------------*/
+
+
+    public int holdRequestExpiry;
+
     private static Library obj;
 
     public static Library getInstance() {
@@ -38,25 +41,26 @@ public class Library {
         return obj;
     }
 
-    private Library()   // default cons.
+    private Library()
     {
         name = null;
         customers = new ArrayList();
-
         booksInLibrary = new ArrayList();
         loans = new ArrayList();
+        dvdsInLibrary = new ArrayList();
+        loaneddvds = new ArrayList();
     }
 
     public void setReturnDeadline(int deadline) {
-        book_return_deadline = deadline;
+        bookReturnDeadline = deadline;
     }
 
     public void setFine(double perDayFine) {
-        per_day_fine = perDayFine;
+        this.perDayFineForBook = perDayFine;
     }
 
     public void setRequestExpiry(int hrExpiry) {
-        hold_request_expiry = hrExpiry;
+        holdRequestExpiry = hrExpiry;
     }
 
     public void setName(String n) {
@@ -76,6 +80,9 @@ public class Library {
         return booksInLibrary;
     }
 
+    public ArrayList<DVD> getDvds() {
+        return dvdsInLibrary;
+    }
 
     public void addBorrower(Borrower b) {
         customers.add(b);
@@ -84,6 +91,11 @@ public class Library {
 
     public void addLoan(LoanedBooks l) {
         loans.add(l);
+    }
+
+    public void listCustomerLoanedItems()
+    {
+
     }
 
     public Borrower findBorrower() {
@@ -109,6 +121,10 @@ public class Library {
 
     public void addBookinLibrary(Book b) {
         booksInLibrary.add(b);
+    }
+
+    public void addDVDinLibrary(DVD b) {
+        dvdsInLibrary.add(b);
     }
 
 
@@ -303,8 +319,6 @@ public class Library {
     }
 
 
-    //---------------------------------------------------------------------------------------//
-    /*--------------------------------IN- COLLABORATION WITH DATA BASE------------------------------------------*/
 
     // Making Connection With Database
     public Connection makeConnection() {
@@ -363,6 +377,34 @@ public class Library {
             Book.setIDCount(maxID);
         }
 
+        /* --- Populating DVD ----*/
+         SQL = "SELECT * FROM DVD";
+         rs = stmt.executeQuery(SQL);
+
+        if (!rs.next()) {
+            System.out.println("\nNo DVD Found in Library");
+        } else {
+            int maxID = 0;
+
+            do {
+                if (rs.getString("DVDNAME") != null && rs.getString("AUTHOR") != null && rs.getString("SUBJECT") != null && rs.getInt("ID") != 0) {
+                    String dvdName = rs.getString("DVDNAME");
+                    String author = rs.getString("AUTHOR");
+                    String subject = rs.getString("SUBJECT");
+                    int id = rs.getInt("ID");
+                    boolean issue = rs.getBoolean("IS_ISSUED");
+                    DVD dvd = new DVD(id, dvdName, subject, author, issue);
+                    addDVDinLibrary(dvd);
+
+                    if (maxID < id)
+                        maxID = id;
+                }
+            } while (rs.next());
+
+            // setting DVD Count
+            DVD.setIDCount(maxID);
+        }
+
         /*---Populating Borrowers (partially)!!!!!!--------*/
 
         SQL = "SELECT ID,PNAME,ADDRESS,PASSWORD,PHONE_NO FROM CUSTOMER INNER JOIN BORROWER ON ID=B_ID";
@@ -396,6 +438,7 @@ public class Library {
             do {
                 int borid = rs.getInt("BORROWER");
                 int bokid = rs.getInt("BOOK");
+                int dvdid = rs.getInt("DVD");
                 int rd = 0;
 
                 Date rdate;
@@ -423,10 +466,18 @@ public class Library {
                     }
                 }
 
+                ArrayList<DVD> dvds = getDvds();
+                for (int k = 0; k < dvds.size() ; k++) {
+                    if (dvds.get(k).getDvdID() == dvdid) {
+                        set = false;
+                        LoanedDVDs l = new LoanedDVDs(bb, dvds.get(k), idate, rdate, fineStatus);
+                        loaneddvds.add(l);
+                    }
+                }
+
             } while (rs.next());
         }
 
-        /* --- Populating Borrower's Remaining Info----*/
 
         // Borrowed Books
         SQL = "SELECT ID,BOOK FROM CUSTOMER INNER JOIN BORROWER ON ID=B_ID INNER JOIN BORROWED_BOOK ON B_ID=BORROWER ";
@@ -438,8 +489,8 @@ public class Library {
         } else {
 
             do {
-                int id = rs.getInt("ID");      // borrower
-                int bid = rs.getInt("BOOK");   // book
+                int id = rs.getInt("ID");
+                int bid = rs.getInt("BOOK");
 
                 Borrower bb = null;
                 boolean set = true;
@@ -469,9 +520,49 @@ public class Library {
             } while (rs.next());
         }
 
+        // Borrowed DVD
+        SQL = "SELECT ID,DVD FROM CUSTOMER INNER JOIN BORROWER ON ID=B_ID INNER JOIN BORROWED_DVD ON B_ID=BORROWER ";
+
+        rs = stmt.executeQuery(SQL);
+
+        if (!rs.next()) {
+            System.out.println("No Borrower has borrowed yet from Library");
+        } else {
+
+            do {
+                int id = rs.getInt("ID");
+                int did = rs.getInt("DVD");
+
+                Borrower bb = null;
+                boolean set = true;
+                boolean okay = true;
+
+                for (int i = 0; i < lib.getcustomers().size() && set; i++) {
+                    if (lib.getcustomers().get(i).getClass().getSimpleName().equals("Borrower")) {
+                        if (lib.getcustomers().get(i).getId() == id) {
+                            set = false;
+                            bb = (Borrower) (lib.getcustomers().get(i));
+                        }
+                    }
+                }
+
+                set = true;
+
+                ArrayList<LoanedDVDs> dvds = loaneddvds;
+
+                for (int i = 0; i < dvds.size() && set; i++) {
+                    if (dvds.get(i).getDvd().getDvdID() == did) {
+                        set = false;
+                        LoanedDVDs loanedDVD = new LoanedDVDs(bb, dvds.get(i).getDvd(), null, dvds.get(i).getIssuedDate(), false);
+                        bb.addBorrowedDVD(loanedDVD);
+                    }
+                }
+
+            } while (rs.next());
+        }
+
         ArrayList<Customer> customers = lib.getcustomers();
 
-        /* Setting CUSTOMER ID Count */
         int max = 0;
 
         for (int i = 0; i < customers.size(); i++) {
@@ -483,65 +574,65 @@ public class Library {
     }
 
 
-    // Filling Changes back to Database
+  /*  // Filling Changes back to Database
     public void fillItBack(Connection con) throws SQLException, SQLIntegrityConstraintViolationException {
-        /*-----------Loan Table Cleared------------*/
+        *//*-----------Loan Table Cleared------------*//*
 
         String template = "DELETE FROM LIBRARY.LOAN";
         PreparedStatement stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------Borrowed Books Table Cleared------------*/
+        *//*-----------Borrowed Books Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.BORROWED_BOOK";
         stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------OnHoldBooks Table Cleared------------*/
+        *//*-----------OnHoldBooks Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.ON_HOLD_BOOK";
         stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------Books Table Cleared------------*/
+        *//*-----------Books Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.BOOK";
         stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------Clerk Table Cleared------------*/
+        *//*-----------Clerk Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.CLERK";
         stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------Librarian Table Cleared------------*/
+        *//*-----------Librarian Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.LIBRARIAN";
         stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------Borrower Table Cleared------------*/
+        *//*-----------Borrower Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.BORROWER";
         stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------Staff Table Cleared------------*/
+        *//*-----------Staff Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.STAFF";
         stmts = con.prepareStatement(template);
 
         stmts.executeUpdate();
 
-        /*-----------CUSTOMER Table Cleared------------*/
+        *//*-----------CUSTOMER Table Cleared------------*//*
 
         template = "DELETE FROM LIBRARY.CUSTOMER";
         stmts = con.prepareStatement(template);
@@ -550,7 +641,7 @@ public class Library {
 
         Library lib = this;
 
-        /* Filling CUSTOMER's Table*/
+        *//* Filling CUSTOMER's Table*//*
         for (int i = 0; i < lib.getcustomers().size(); i++) {
             template = "INSERT INTO LIBRARY.CUSTOMER (ID,PNAME,PASSWORD,ADDRESS,PHONE_NO) values (?,?,?,?,?)";
             PreparedStatement stmt = con.prepareStatement(template);
@@ -565,7 +656,7 @@ public class Library {
         }
 
 
-        /* Filling Borrower's Table*/
+        *//* Filling Borrower's Table*//*
         for (int i = 0; i < lib.getcustomers().size(); i++) {
             if (lib.getcustomers().get(i).getClass().getSimpleName().equals("Borrower")) {
                 template = "INSERT INTO LIBRARY.BORROWER(B_ID) values (?)";
@@ -579,7 +670,7 @@ public class Library {
 
         ArrayList<Book> books = lib.getBooks();
 
-        /*Filling Book's Table*/
+        *//*Filling Book's Table*//*
         for (int i = 0; i < books.size(); i++) {
             template = "INSERT INTO LIBRARY.BOOK (ID,TITLE,AUTHOR,SUBJECT,IS_ISSUED) values (?,?,?,?,?)";
             PreparedStatement stmt = con.prepareStatement(template);
@@ -593,9 +684,9 @@ public class Library {
 
         }
 
-        /*
-         */
-        /* Filling Loan Book's Table*//*
+        *//*
+         *//*
+        *//* Filling Loan Book's Table*//**//*
 
         for(int i=0;i<loans.size();i++)
         {
@@ -612,10 +703,10 @@ public class Library {
             stmt.executeUpdate();
 
         }
-*/
+*//*
 
 
-        /*for(int i=0;i<lib.getBooks().size();i++)
+        *//*for(int i=0;i<lib.getBooks().size();i++)
         {
             for(int j=0;j<lib.getBooks().get(i).getHoldRequests().size();j++)
             {
@@ -629,9 +720,9 @@ public class Library {
 
             stmt.executeUpdate();
             }
-        }*/
+        }*//*
 
-        /* Filling Borrowed Book Table*/
+        *//* Filling Borrowed Book Table*//*
         for (int i = 0; i < lib.getBooks().size(); i++) {
             if (lib.getBooks().get(i).isIssued()== true) {
                 boolean set = true;
@@ -651,7 +742,7 @@ public class Library {
 
             }
         }
-    } // Filling Done!
+    } // Filling Done!*/
 
 
 }

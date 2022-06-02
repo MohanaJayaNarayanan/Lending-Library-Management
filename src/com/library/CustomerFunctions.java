@@ -3,6 +3,7 @@ package com.library;
 import com.library.model.Borrower;
 import com.library.model.Library;
 import com.library.model.LoanedBooks;
+import com.library.model.LoanedDVDs;
 import com.library.utils.InputUtils;
 
 import java.io.BufferedReader;
@@ -26,8 +27,7 @@ public class CustomerFunctions {
 
         //Display list of items customer has rented so far
         else if (choice == 2) {
-
-
+            trackCustomerLoanLists(lib);
         }
 
         //Option for taking a new item from the library by the customer.
@@ -115,6 +115,35 @@ public class CustomerFunctions {
             } else
                 System.out.println("\nThis borrower " + borrower.getName() + " has no book to return.");
         }
+    }
+
+
+    private static void trackCustomerLoanLists(Library lib) {
+
+        Borrower borrower = lib.findBorrower();
+        int input = 0;
+
+        if (borrower != null) {
+            borrower.printBorrowedBooks();
+            borrower.printBorrowedDVDs();
+        }
+         /*   ArrayList<LoanedBooks> loans = borrower.getBorrowedBooks();
+            ArrayList<LoanedDVDs> dvds = borrower.getBorrowedDVDs();
+
+            if (!loans.isEmpty()) {
+                input = InputUtils.takeInput(-1, loans.size());
+                LoanedBooks loanedBooks = loans.get(input);
+                loanedBooks.getBook().returnBook(borrower, loanedBooks);
+            } else
+                System.out.println("\nThis borrower " + borrower.getName() + " has no book to return.");
+
+            if (!dvds.isEmpty()) {
+                input = InputUtils.takeInput(-1, dvds.size());
+                LoanedDVDs loanedDVDs = dvds.get(input);
+                loanedDVDs.getDvd().returnDVD(borrower, loanedDVDs);
+            } else
+                System.out.println("\nThis borrower " + borrower.getName() + " has no DVD to return.");
+        }*/
     }
 
 }

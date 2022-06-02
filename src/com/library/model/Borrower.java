@@ -9,17 +9,20 @@ import java.util.Scanner;
 public class Borrower extends Customer {
 
     private ArrayList<LoanedBooks> borrowedBooks;
+    private ArrayList<LoanedDVDs> borrowedDVDs;
 
     public Borrower(int id, String name, String address, String phoneNum)
     {
         super(id, name, address, phoneNum);
-        borrowedBooks = new ArrayList();
+        borrowedBooks = new ArrayList<>();
+        borrowedDVDs = new ArrayList<>();
     }
 
     @Override
     public void printInfo() {
         super.printInfo();
         printBorrowedBooks();
+        printBorrowedDVDs();
 
     }
 
@@ -37,6 +40,22 @@ public class Borrower extends Customer {
             }
         } else
             System.out.println("\nNo borrowed books.");
+    }
+
+    public void printBorrowedDVDs() {
+        if (!borrowedDVDs.isEmpty()) {
+            System.out.println("\nBorrowed DVDs are: ");
+            System.out.println("------------------------------------------------------------------------------");
+            System.out.println("No.\t\tTitle\t\t\tAuthor\t\t\tSubject");
+            System.out.println("------------------------------------------------------------------------------");
+
+            for (int i = 0; i < borrowedDVDs.size(); i++) {
+                System.out.print(i + "-" + "\t\t");
+                borrowedDVDs.get(i).getDvd().printInfo();
+                System.out.print("\n");
+            }
+        } else
+            System.out.println("\nNo borrowed DVDS.");
     }
 
 
@@ -97,13 +116,24 @@ public class Borrower extends Customer {
         borrowedBooks.add(iBook);
     }
 
+    public void addBorrowedDVD(LoanedDVDs loanedDVD) {
+        borrowedDVDs.add(loanedDVD);
+    }
+
     public void removeBorrowedBook(LoanedBooks iBook) {
         borrowedBooks.remove(iBook);
+    }
+
+    public void removeBorrowedDVD(LoanedDVDs loanedDVD) {
+        borrowedBooks.remove(loanedDVD);
     }
 
     public ArrayList<LoanedBooks> getBorrowedBooks() {
         return borrowedBooks;
     }
 
+    public ArrayList<LoanedDVDs> getBorrowedDVDs() {
+        return borrowedDVDs;
+    }
 
 }

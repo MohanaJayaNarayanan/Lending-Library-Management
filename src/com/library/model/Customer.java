@@ -9,8 +9,8 @@ public  class Customer
     protected String address;
     protected String phoneNo;
     protected double depositAmount;
-    static int currentIdNumber = 0;     //This will be unique for every person, since it will be incremented when everytime
-                                       //when a person is created
+    static int currentIdNumber = 0;
+
 
     public Customer(int id,String name, String address, String phoneNo) {
         currentIdNumber++;

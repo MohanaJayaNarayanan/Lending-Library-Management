@@ -5,16 +5,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Scanner;
 
-public class LoanedBooks {
+public class LoanedDVDs {
     private Borrower borrower;
-    private Book book;
+    private DVD dvd;
     private Date issuedDate;
     private Date dateReturned;
     private boolean finePaid;
 
-    public LoanedBooks(Borrower borrower, Book book, Date issuedDate, Date dateReturned, boolean finePaid) {
+    public LoanedDVDs(Borrower borrower, DVD dvd, Date issuedDate, Date dateReturned, boolean finePaid) {
         this.borrower = borrower;
-        this.book = book;
+        this.dvd = dvd;
         this.issuedDate = issuedDate;
         this.dateReturned = dateReturned;
         this.finePaid = finePaid;
@@ -29,12 +29,12 @@ public class LoanedBooks {
         this.borrower = borrower;
     }
 
-    public Book getBook() {
-        return book;
+    public DVD getDvd() {
+        return dvd;
     }
 
-    public void setBook(Book book) {
-        this.book = book;
+    public void setDvd(DVD dvd) {
+        this.dvd = dvd;
     }
 
     public Date getIssuedDate() {
@@ -75,7 +75,7 @@ public class LoanedBooks {
             days = days - Library.getInstance().bookReturnDeadline;
 
             if (days > 0)
-                totalFine = days * Library.getInstance().perDayFineForBook;
+                totalFine = days * Library.getInstance().perDayFineForDVD;
             else
                 totalFine = 0;
         }

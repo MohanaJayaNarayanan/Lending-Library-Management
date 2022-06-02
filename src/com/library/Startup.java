@@ -57,31 +57,9 @@ public class Startup {
                         while (true)    // Way to Admin Portal
                         {
                             InputUtils.clrscr();
-
-                            System.out.println("--------------------------------------------------------");
-                            System.out.println("\tWelcome to Admin's Portal");
-                            System.out.println("--------------------------------------------------------");
-                            System.out.println("Following Functionalities are available: \n");
-
-                            System.out.println("1- Add Customer of borrower type");
-                            System.out.println("2- ");
-                            System.out.println("3- Exit operations");
-
-                            System.out.println("---------------------------------------------");
-
-                            choice = InputUtils.takeInput(0, 4);
-
-                            if (choice == 3)
-                                break;
-
-                            else if (choice == 1)
                                 lib.createCUSTOMER('B');
 
-                            else if (choice == 2)
-                                lib.viewAllBooks();
-
                             System.out.println("\nPress any key to continue..\n");
-                            admin.next();
                         }
                     } else
                         System.out.println("\nSorry! Wrong Password.");
@@ -90,7 +68,7 @@ public class Startup {
                         InputUtils.clrscr();
 
                         System.out.println("--------------------------------------------------------");
-                        System.out.println("\tWelcome to Borrower's Portal");
+                        System.out.println("\tWelcome to Library's Function Portal");
                         System.out.println("--------------------------------------------------------");
                         System.out.println("Following Functionalities are available: \n");
                         System.out.println("1- Track the customer");
