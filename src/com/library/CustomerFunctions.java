@@ -3,13 +3,10 @@ package com.library;
 import com.library.model.Borrower;
 import com.library.model.Library;
 import com.library.model.LoanedBooks;
-import com.library.model.LoanedDVDs;
 import com.library.utils.InputUtils;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class CustomerFunctions {
@@ -30,24 +27,18 @@ public class CustomerFunctions {
             trackCustomerLoanLists(lib);
         }
 
-        //Option for taking a new item from the library by the customer.
-      /*  else if (choice == 3)
-        {
-            ArrayList<Book> books = lib.searchForBooks();
+        //Display list of overdue items
+        else if (choice == 3) {
+            fetchOverDueItems(lib);
+        }
 
-            if (books != null)
-            {
-                input = takeInput(-1,books.size());
-                Book b = books.get(input);
+        //Display list of items available for the books
+        else if (choice == 4) {
+           int count = lib.searchForBooks();
+            System.out.println("Number of books found for the given book search criteria :: "+count);
+        }
 
-                Borrower bor = lib.findBorrower();
 
-                if(bor!=null)
-                {
-                    b.issueBook(bor, (Staff)customer);
-                }
-            }
-        }*/
         else if (choice == 6) {
 
         }
@@ -69,34 +60,34 @@ public class CustomerFunctions {
             }
         }
 
-        //Update Borrower's customeral Info
-        else if (choice == 10) {
-            Borrower bor = lib.findBorrower();
-
-            if (bor != null)
-                bor.updateBorrowerInfo();
-        }
-
-        //Add new Book
-        else if (choice == 11) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-            System.out.println("\nEnter Title:");
-            String title = reader.readLine();
-
-            System.out.println("\nEnter Subject:");
-            String subject = reader.readLine();
-
-            System.out.println("\nEnter Author:");
-            String author = reader.readLine();
-
-            lib.createBook(title, subject, author);
-        }
-
-
         // Functionality Performed.
         System.out.println("\nPress any key to continue..\n");
         scanner.next();
+    }
+
+    private static void fetchOverDueItems(Library lib) {
+        Borrower borrower = lib.findBorrower();
+        int input = 0;
+
+        if (borrower != null) {
+            borrower.printBorrowedBooks();
+            ArrayList<LoanedBooks> loans = borrower.getBorrowedBooks();
+
+            if(!loans.isEmpty())
+            {
+                LoanedBooks loanedBooks = loans.get(input);
+                loanedBooks.setIssuedDate(loanedBooks.getIssuedDate());
+               double fine = loanedBooks.computeFine1();
+                System.out.println("Fine to be payable for the item "+loanedBooks +" is :: "+fine);
+            }
+
+            if (!loans.isEmpty()) {
+                input = InputUtils.takeInput(-1, loans.size());
+                LoanedBooks loanedBooks = loans.get(input);
+                loanedBooks.getBook().returnBook(borrower, loanedBooks);
+            } else
+                System.out.println("\nThis borrower " + borrower.getName() + " has no book to return.");
+        }
     }
 
     private static void trackCustomer(Library lib) {
@@ -119,7 +110,6 @@ public class CustomerFunctions {
 
 
     private static void trackCustomerLoanLists(Library lib) {
-
         Borrower borrower = lib.findBorrower();
         int input = 0;
 
@@ -127,23 +117,6 @@ public class CustomerFunctions {
             borrower.printBorrowedBooks();
             borrower.printBorrowedDVDs();
         }
-         /*   ArrayList<LoanedBooks> loans = borrower.getBorrowedBooks();
-            ArrayList<LoanedDVDs> dvds = borrower.getBorrowedDVDs();
-
-            if (!loans.isEmpty()) {
-                input = InputUtils.takeInput(-1, loans.size());
-                LoanedBooks loanedBooks = loans.get(input);
-                loanedBooks.getBook().returnBook(borrower, loanedBooks);
-            } else
-                System.out.println("\nThis borrower " + borrower.getName() + " has no book to return.");
-
-            if (!dvds.isEmpty()) {
-                input = InputUtils.takeInput(-1, dvds.size());
-                LoanedDVDs loanedDVDs = dvds.get(input);
-                loanedDVDs.getDvd().returnDVD(borrower, loanedDVDs);
-            } else
-                System.out.println("\nThis borrower " + borrower.getName() + " has no DVD to return.");
-        }*/
     }
 
 }

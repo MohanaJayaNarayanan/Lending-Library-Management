@@ -129,7 +129,7 @@ public class Library {
 
 
     // Searching Books on basis of title, Subject or Author
-    public ArrayList<Book> searchForBooks() throws IOException {
+    public int searchForBooks() throws IOException {
         String choice;
         String title = "", subject = "", author = "";
 
@@ -177,22 +177,10 @@ public class Library {
 
         //Printing all the matched Books
         if (!matchedBooks.isEmpty()) {
-            System.out.println("\nThese books are found: \n");
-
-            System.out.println("------------------------------------------------------------------------------");
-            System.out.println("No.\t\tTitle\t\t\tAuthor\t\t\tSubject");
-            System.out.println("------------------------------------------------------------------------------");
-
-            for (int i = 0; i < matchedBooks.size(); i++) {
-                System.out.print(i + "-" + "\t\t");
-                matchedBooks.get(i).printInfo();
-                System.out.print("\n");
-            }
-
-            return matchedBooks;
+            return matchedBooks.size();
         } else {
             System.out.println("\nSorry. No Books were found related to your query.");
-            return null;
+            return 0;
         }
     }
 
@@ -572,177 +560,5 @@ public class Library {
 
         Customer.setIDCount(max);
     }
-
-
-  /*  // Filling Changes back to Database
-    public void fillItBack(Connection con) throws SQLException, SQLIntegrityConstraintViolationException {
-        *//*-----------Loan Table Cleared------------*//*
-
-        String template = "DELETE FROM LIBRARY.LOAN";
-        PreparedStatement stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------Borrowed Books Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.BORROWED_BOOK";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------OnHoldBooks Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.ON_HOLD_BOOK";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------Books Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.BOOK";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------Clerk Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.CLERK";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------Librarian Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.LIBRARIAN";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------Borrower Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.BORROWER";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------Staff Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.STAFF";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        *//*-----------CUSTOMER Table Cleared------------*//*
-
-        template = "DELETE FROM LIBRARY.CUSTOMER";
-        stmts = con.prepareStatement(template);
-
-        stmts.executeUpdate();
-
-        Library lib = this;
-
-        *//* Filling CUSTOMER's Table*//*
-        for (int i = 0; i < lib.getcustomers().size(); i++) {
-            template = "INSERT INTO LIBRARY.CUSTOMER (ID,PNAME,PASSWORD,ADDRESS,PHONE_NO) values (?,?,?,?,?)";
-            PreparedStatement stmt = con.prepareStatement(template);
-
-            stmt.setInt(1, lib.getcustomers().get(i).getId());
-            stmt.setString(2, lib.getcustomers().get(i).getName());
-            stmt.setString(3, lib.getcustomers().get(i).getPassword());
-            stmt.setString(4, lib.getcustomers().get(i).getAddress());
-            stmt.setString(5, lib.getcustomers().get(i).getPhoneNo());
-
-            stmt.executeUpdate();
-        }
-
-
-        *//* Filling Borrower's Table*//*
-        for (int i = 0; i < lib.getcustomers().size(); i++) {
-            if (lib.getcustomers().get(i).getClass().getSimpleName().equals("Borrower")) {
-                template = "INSERT INTO LIBRARY.BORROWER(B_ID) values (?)";
-                PreparedStatement stmt = con.prepareStatement(template);
-
-                stmt.setInt(1, lib.getcustomers().get(i).getId());
-
-                stmt.executeUpdate();
-            }
-        }
-
-        ArrayList<Book> books = lib.getBooks();
-
-        *//*Filling Book's Table*//*
-        for (int i = 0; i < books.size(); i++) {
-            template = "INSERT INTO LIBRARY.BOOK (ID,TITLE,AUTHOR,SUBJECT,IS_ISSUED) values (?,?,?,?,?)";
-            PreparedStatement stmt = con.prepareStatement(template);
-
-            stmt.setInt(1, books.get(i).getBookID());
-            stmt.setString(2, books.get(i).getTitle());
-            stmt.setString(3, books.get(i).getAuthor());
-            stmt.setString(4, books.get(i).getSubject());
-            stmt.setBoolean(5, books.get(i).isIssued());
-            stmt.executeUpdate();
-
-        }
-
-        *//*
-         *//*
-        *//* Filling Loan Book's Table*//**//*
-
-        for(int i=0;i<loans.size();i++)
-        {
-            template = "INSERT INTO LIBRARY.LOAN(L_ID,BORROWER,BOOK,ISSUER,ISS_DATE,RECEIVER,RET_DATE,FINE_PAID) values (?,?,?,?,?,?,?,?)";
-            PreparedStatement stmt = con.prepareStatement(template);
-
-            stmt.setInt(1,i+1);
-            stmt.setInt(2,loans.get(i).getBorrower().getID());
-            stmt.setInt(3,loans.get(i).getBook().getID());
-            stmt.setInt(4,loans.get(i).getIssuer().getID());
-            stmt.setTimestamp(5,new java.sql.Timestamp(loans.get(i).getIssuedDate().getTime()));
-            stmt.setBoolean(8,loans.get(i).ge());
-
-            stmt.executeUpdate();
-
-        }
-*//*
-
-
-        *//*for(int i=0;i<lib.getBooks().size();i++)
-        {
-            for(int j=0;j<lib.getBooks().get(i).getHoldRequests().size();j++)
-            {
-            template = "INSERT INTO LIBRARY.ON_HOLD_BOOK(REQ_ID,BOOK,BORROWER,REQ_DATE) values (?,?,?,?)";
-            PreparedStatement stmt = con.prepareStatement(template);
-
-            stmt.setInt(1,i+1);
-            stmt.setInt(3,lib.getBooks().get(i).getHoldRequests().get(j).getBorrower().getID());
-            stmt.setInt(2,lib.getBooks().get(i).getHoldRequests().get(j).getBook().getID());
-            stmt.setDate(4,new java.sql.Date(lib.getBooks().get(i).getHoldRequests().get(j).getRequestDate().getTime()));
-
-            stmt.executeUpdate();
-            }
-        }*//*
-
-        *//* Filling Borrowed Book Table*//*
-        for (int i = 0; i < lib.getBooks().size(); i++) {
-            if (lib.getBooks().get(i).isIssued()== true) {
-                boolean set = true;
-                for (int j = 0; j < loans.size() && set; j++) {
-                    if (lib.getBooks().get(i).getBookID() == loans.get(j).getBook().getBookID()) {
-
-                        template = "INSERT INTO LIBRARY.BORROWED_BOOK(BOOK,BORROWER) values (?,?)";
-                        PreparedStatement stmt = con.prepareStatement(template);
-                        stmt.setInt(1, loans.get(j).getBook().getBookID());
-                        stmt.setInt(2, loans.get(j).getBorrower().getId());
-
-                        stmt.executeUpdate();
-                        set = false;
-                    }
-
-                }
-
-            }
-        }
-    } // Filling Done!*/
-
 
 }

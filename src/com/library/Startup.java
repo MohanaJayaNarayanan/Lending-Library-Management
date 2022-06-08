@@ -74,7 +74,7 @@ public class Startup {
                         System.out.println("1- Track the customer");
                         System.out.println("2- Display list of items customer has rented so far");
                         System.out.println("3- Display list of overdue items for a customer and total amount due to be paid by the customer");
-                        System.out.println("4- Check no. of items available in the library for a given item using item id");
+                        System.out.println("4- Check no. of items available in the library for a given item using item details");
                         System.out.println("5- Option for taking a new item from the library by the customer");
                         System.out.println("6- Option for returning an item back to the library");
                         System.out.println("7- Logout");
