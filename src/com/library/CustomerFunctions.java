@@ -6,7 +6,6 @@ import com.library.model.LoanedBooks;
 import com.library.utils.InputUtils;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Scanner;
 
 public class CustomerFunctions {
@@ -36,11 +35,6 @@ public class CustomerFunctions {
         else if (choice == 4) {
            int count = lib.searchForBooks();
             System.out.println("Number of books found for the given book search criteria :: "+count);
-        }
-
-
-        else if (choice == 6) {
-
         }
 
         //Return a Book

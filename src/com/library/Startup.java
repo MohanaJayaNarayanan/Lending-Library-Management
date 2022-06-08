@@ -94,9 +94,7 @@ public class Startup {
                 Scanner scanner = new Scanner(System.in);
                 scanner.next();
             }
-
-            //Loading back all the records in database
-            // lib.fillItBack(con);
+            
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("\nExiting...\n");
